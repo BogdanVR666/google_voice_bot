@@ -1,0 +1,4 @@
+aiogram==2.25.1
+aiogram==2.25.1
+bardapi==0.1.28
+environs==9.5.0
