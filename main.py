@@ -1,12 +1,12 @@
 from bardapi import Bard
-from config import get_tokens
+from config import get_config
 import hashlib
 import logging
 
 from aiogram import Bot, Dispatcher, executor
 from aiogram.types import InlineQuery, InlineQueryResultCachedAudio
 
-config = get_tokens()
+config = get_config()
 bard = Bard(token_from_browser=True)
 
 

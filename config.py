@@ -1,20 +1,17 @@
 from environs import Env
 from dataclasses import dataclass
 
-env = Env()
-env.read_env(".env")
-
 @dataclass
 class Token:
     bot_token: str
-    bard_token: str
+    bard_token: str = None
     
 def pars_bard_token():
-    return (
-        env.str("BARD_TOKEN")
-    )
+    pass
     
 def get_config():
+    env = Env()
+    env.read_env(".env")
     return Token(
         env.str("BOT_TOKEN"),
         pars_bard_token()
