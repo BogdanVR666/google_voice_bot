@@ -70,7 +70,7 @@ async def inline(inline_query: InlineQuery) -> None:
 
 
 async def start(bot):
-    await login()
+    await login(config.email, config.password)
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
 
