@@ -32,7 +32,7 @@ async def tts(text: str) -> list:
             file.write(bytes(await bard.speech(text)))
         return [True]
     except Exception as e:
-        logger.warning(e)
+        logger.warning(f"{e}")
         return [e, False]
 
 
