@@ -8,10 +8,10 @@ from aiogram.types import InlineQuery
 class Config:
     bot_token: str
     channel_id: str
-    admin_ids: list[int]
+    admin_ids: list
 
 
-def get_config():
+def get_config() -> Config:
     env = Env()
     env.read_env(".env")
     return Config(

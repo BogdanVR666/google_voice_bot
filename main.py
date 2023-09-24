@@ -26,7 +26,7 @@ bot = Bot(token=config.bot_token, parse_mode="HTML")
 dp = Dispatcher()
 
 
-async def tts(text: str) -> None:
+async def tts(text: str) -> bool:
     try:
         with open("bard_speech.ogg", "wb") as file:
             file.write(bytes(await bard.speech(text)))
@@ -37,7 +37,7 @@ async def tts(text: str) -> None:
 
 
 @dp.inline_query(AdminFilter())
-async def inline(inline_query: InlineQuery):
+async def inline(inline_query: InlineQuery) -> None:
     text = inline_query.query
     if await tts(text):
         send = await bot.send_voice(
