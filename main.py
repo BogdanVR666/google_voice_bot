@@ -42,7 +42,7 @@ async def inline(inline_query: InlineQuery) -> None:
     speech = await tts(text)
     if all(speech):
         send = await bot.send_voice(
-            chat_id=config.channel_id, voice=FSInputFile("bard_speech.ogg")
+            chat_id=config.service_chat_id, voice=FSInputFile("bard_speech.ogg")
         )
         with_text = InlineQueryResultCachedVoice(
             id=str(uuid4()),

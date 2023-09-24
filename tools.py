@@ -7,7 +7,7 @@ from aiogram.types import InlineQuery
 @dataclass
 class Config:
     bot_token: str
-    channel_id: str
+    service_chat_id: str
     admin_ids: list
 
 
@@ -16,7 +16,7 @@ def get_config() -> Config:
     env.read_env(".env")
     return Config(
         bot_token=env.str("BOT_TOKEN"),
-        channel_id=env.str("CHANNEL_ID"),
+        service_chat_id=env.str("SERVICE_CHAT_ID"),
         admin_ids=[int(i) for i in env.list("ADMIN_IDS")],
     )
 
