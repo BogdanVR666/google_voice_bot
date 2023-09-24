@@ -2,7 +2,7 @@ import asyncio
 import logging
 import betterlogging as bl
 from uuid import uuid4
-from tools import get_config, AdminFilter
+from tools import get_config, AdminFilter, login
 from bardapi import BardAsync
 from aiogram import Bot, Dispatcher
 from aiogram.types import (
@@ -12,11 +12,11 @@ from aiogram.types import (
     InlineQueryResultArticle,
     InputTextMessageContent,
 )
-
+       
+config = get_config()
 logger = logging.getLogger("Bard_Voice_Bot")
 LOG_LEVEL = logging.INFO
 bl.basic_colorized_config(level=LOG_LEVEL)
-config = get_config()
 bard = BardAsync(token_from_browser=True)
 logging.basicConfig(
     level=LOG_LEVEL,
@@ -70,6 +70,7 @@ async def inline(inline_query: InlineQuery) -> None:
 
 
 async def start(bot):
+    await login()
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
 
