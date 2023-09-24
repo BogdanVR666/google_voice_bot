@@ -17,9 +17,7 @@ logger = logging.getLogger("Bard_Voice_Bot")
 LOG_LEVEL = logging.INFO
 bl.basic_colorized_config(level=LOG_LEVEL)
 config = get_config()
-bard = BardAsync(
-    token="bQisFobFeHNP_eFK16vXGAdT2--B6_2pNJ0kLexePtUK-Ix14aLzHl7-FddB5hkRHWwE8w.."
-)
+bard = BardAsync(token_from_browser=True)
 logging.basicConfig(
     level=LOG_LEVEL,
     format="%(filename)s:%(lineno)d #%(levelname)-8s [%(asctime)s] - %(name)s - %(message)s",
