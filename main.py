@@ -1,40 +1,77 @@
-from bardapi import Bard
-from config import get_config
-import hashlib
+import asyncio
 import logging
+import betterlogging as bl
+from uuid import uuid4
+from tools import get_config, AdminFilter
+from bardapi import BardAsync
+from aiogram import Bot, Dispatcher
+from aiogram.types import (
+    InlineQuery,
+    InlineQueryResultCachedVoice,
+    FSInputFile,
+    InlineQueryResultArticle,
+    InputTextMessageContent,
+)
 
-from aiogram import Bot, Dispatcher, executor
-from aiogram.types import InlineQuery, InlineQueryResultCachedAudio
-
+logger = logging.getLogger("Bard_Voice_Bot")
+LOG_LEVEL = logging.INFO
+bl.basic_colorized_config(level=LOG_LEVEL)
 config = get_config()
-bard = Bard(token_from_browser=True)
+bard = BardAsync(token_from_browser=True)
+logging.basicConfig(
+    level=LOG_LEVEL,
+    format="%(filename)s:%(lineno)d #%(levelname)-8s [%(asctime)s] - %(name)s - %(message)s",
+)
+bot = Bot(token=config.bot_token, parse_mode="HTML")
+dp = Dispatcher()
 
 
-logging.basicConfig(level=logging.DEBUG)
+async def tts(text: str) -> None:
+    try:
+        with open("bard_speech.ogg", "wb") as file:
+            file.write(bytes(await bard.speech(text)))
+        return True
+    except Exception as e:
+        logger.warning(e)
+        return False
 
-bot = Bot(token=config.bot_token)
-dp = Dispatcher(bot)
 
-
-def tts(text: str) -> None:
-    with open("bard_speech.ogg", "wb") as file:
-        file.write(bytes(bard.speech(text)))
-
-
-@dp.inline_handler()
+@dp.inline_query(AdminFilter())
 async def inline(inline_query: InlineQuery):
     text = inline_query.query
-    result_id: str = hashlib.md5(text.encode()).hexdigest()
-    tts(text)
-    url = ""
-    logging.info(url)
-    item = InlineQueryResultCachedAudio(
-        id=result_id,
-        audio_file_id= url,
-        caption=f'Speech Result of {text}'
-    )
-    
-    await inline_query.answer(results=[item], cache_time=10)
+    if await tts(text):
+        send = await bot.send_voice(
+            chat_id=config.channel_id, voice=FSInputFile("bard_speech.ogg")
+        )
+        with_text = InlineQueryResultCachedVoice(
+            id=str(uuid4()),
+            title="Speech + Text",
+            voice_file_id=send.voice.file_id,
+            caption=f"<code>{text}</code>",
+        )
+        without_text = InlineQueryResultCachedVoice(
+            id=str(uuid4()), title="Speech", voice_file_id=send.voice.file_id
+        )
+        await inline_query.answer(results=[without_text, with_text], cache_time=10)
+    else:
+        await inline_query.answer(
+            results=[
+                InlineQueryResultArticle(
+                    id=str(uuid4()),
+                    title="Error",
+                    input_message_content=InputTextMessageContent(
+                        message_text="Error while get audio"
+                    ),
+                )
+            ],
+            cache_time=10,
+        )
 
-if __name__ == '__main__':
-    executor.start_polling(dp, skip_updates=True)
+
+async def start(bot):
+    await bot.delete_webhook(drop_pending_updates=True)
+    await dp.start_polling(bot)
+
+
+if __name__ == "__main__":
+    asyncio.run(start(bot))
