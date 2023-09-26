@@ -2,7 +2,7 @@ import asyncio
 import logging
 import betterlogging as bl
 from uuid import uuid4
-from tools import get_config, AdminFilter, login
+from tools import get_config, AdminFilter
 from bardapi import BardAsync
 from aiogram import Bot, Dispatcher
 from aiogram.types import (
@@ -70,7 +70,6 @@ async def inline(inline_query: InlineQuery) -> None:
 
 
 async def start(bot):
-    await login(config.email, config.password)
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
 
